@@ -27,6 +27,15 @@ resource "aws_subnet" "private" {
     count.index
   )
 
+  ipv6_cidr_block = var.assign_ipv6_address_on_creation == true ? (cidrsubnet(
+    data.aws_vpc.default.ipv6_cidr_block,
+    join("", data.aws_vpc.default.*.ipv6_cidr_block),
+    8,
+    count.index
+  )) : null
+
+  assign_ipv6_address_on_creation = var.assign_ipv6_address_on_creation
+
   tags = merge(
     module.private_label.tags,
     {
@@ -72,6 +81,15 @@ resource "aws_network_acl" "private" {
     protocol   = "-1"
   }
 
+  egress {
+    rule_no         = 101
+    action          = "allow"
+    ipv6_cidr_block = "::/0"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+  }
+
   ingress {
     rule_no    = 100
     action     = "allow"
@@ -79,6 +97,15 @@ resource "aws_network_acl" "private" {
     from_port  = 0
     to_port    = 0
     protocol   = "-1"
+  }
+
+  ingress {
+    rule_no         = 101
+    action          = "allow"
+    ipv6_cidr_block = "::/0"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
   }
 
   tags = module.private_label.tags

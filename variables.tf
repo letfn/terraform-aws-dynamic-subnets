@@ -136,3 +136,8 @@ variable "root_block_device_encrypted" {
   default     = true
   description = "Whether to encrypt the root block device"
 }
+
+variable "assign_ipv6_address_on_creation" {
+  type    = bool
+  default = false
+}
