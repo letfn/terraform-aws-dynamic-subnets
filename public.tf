@@ -32,7 +32,7 @@ resource "aws_subnet" "public" {
   ipv6_cidr_block = var.assign_ipv6_address_on_creation == true ? (cidrsubnet(
     join("", data.aws_vpc.default.*.ipv6_cidr_block),
     8,
-    count.index
+    local.public_subnet_count + count.index
   )) : null
 
   assign_ipv6_address_on_creation = var.assign_ipv6_address_on_creation
