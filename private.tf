@@ -61,8 +61,8 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route" "private_ipv6" {
-  count                       = local.enabled_count
-  route_table_id              = join("", aws_route_table.private.*.id)
+  count                       = local.enabled ? local.availability_zones_count : 0
+  route_table_id              = element(aws_route_table.private.*.id, count.index)
   destination_ipv6_cidr_block = "::/0"
   gateway_id                  = var.igw_id
 
