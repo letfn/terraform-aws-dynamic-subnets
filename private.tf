@@ -60,6 +60,18 @@ resource "aws_route_table" "private" {
   )
 }
 
+resource "aws_route" "private_ipv6" {
+  count                       = local.enabled_count
+  route_table_id              = join("", aws_route_table.private.*.id)
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = var.igw_id
+
+  timeouts {
+    create = var.aws_route_create_timeout
+    delete = var.aws_route_delete_timeout
+  }
+}
+
 resource "aws_route_table_association" "private" {
   count          = local.enabled ? local.availability_zones_count : 0
   subnet_id      = element(aws_subnet.private.*.id, count.index)

@@ -70,6 +70,18 @@ resource "aws_route" "public" {
   }
 }
 
+resource "aws_route" "public_ipv6" {
+  count                       = local.public_route_expr_enabled ? 0 : local.enabled_count
+  route_table_id              = join("", aws_route_table.public.*.id)
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = var.igw_id
+
+  timeouts {
+    create = var.aws_route_create_timeout
+    delete = var.aws_route_delete_timeout
+  }
+}
+
 resource "aws_route_table_association" "public" {
   count          = local.public_route_expr_enabled ? 0 : local.availability_zones_count
   subnet_id      = element(aws_subnet.public.*.id, count.index)
